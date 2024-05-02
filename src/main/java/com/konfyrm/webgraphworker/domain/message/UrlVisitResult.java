@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 @Builder
 @EqualsAndHashCode
 public class UrlVisitResult {
-    private String url;
-    private List<String> neighbours;
+    private String startUrl;
+    private Map<String, List<String>> neighbours;
 }
+
