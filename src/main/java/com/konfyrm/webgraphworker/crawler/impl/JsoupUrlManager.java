@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,18 +25,17 @@ public class JsoupUrlManager implements UrlManager {
     private static String ROBOTS_FILE = "robots.txt";
 
     @Override
-    public List<String> getNeighbouringUrls(String url) {
+    public Set<String> getNeighbouringUrls(String url) {
         try {
             Document document = Jsoup.connect(url).get();
             Elements links = document.select("a[href]");
 
             return links.stream()
                     .map(e -> e.absUrl("href"))
-                    .filter(u -> !u.contains("#"))
-                    .toList();
+                    .collect(Collectors.toSet());
         } catch (IOException e) {
             LOGGER.info("Error crawling " + url + ": " + e.getMessage());
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
     }
 

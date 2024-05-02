@@ -1,9 +1,6 @@
 package com.konfyrm.webgraphworker.crawler.impl;
 
-import com.konfyrm.webgraphworker.crawler.HtmlDownloader;
-import com.konfyrm.webgraphworker.crawler.UrlManager;
-import com.konfyrm.webgraphworker.crawler.UrlUtils;
-import com.konfyrm.webgraphworker.crawler.WebCrawler;
+import com.konfyrm.webgraphworker.crawler.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class WebCrawlerImpl implements WebCrawler {
@@ -19,17 +17,20 @@ public class WebCrawlerImpl implements WebCrawler {
 
     private final UrlManager urlManager;
     private final HtmlDownloader htmlDownloader;
+    private final NeighbouringUrlProcessor neighbouringUrlProcessor;
 
     @Autowired
     public WebCrawlerImpl(
             @Qualifier("jsoupUrlManager") UrlManager urlManager,
-            @Qualifier("jsoupHtmlDownloader") HtmlDownloader htmlDownloader
+            @Qualifier("jsoupHtmlDownloader") HtmlDownloader htmlDownloader,
+            @Qualifier("neighbouringUrlProcessorImpl")NeighbouringUrlProcessor neighbouringUrlProcessor
     ) {
         this.urlManager = urlManager;
         this.htmlDownloader = htmlDownloader;
+        this.neighbouringUrlProcessor = neighbouringUrlProcessor;
     }
 
-    public Map<String, List<String>> crawl(String startUrl, int maxVisitedNodes) {
+    public Map<String, Set<String>> crawl(String startUrl, int maxVisitedNodes) {
         Set<String> disallowedPatterns = urlManager.getDisallowedPatterns(startUrl);
 
         if (!isCrawlAllowed(startUrl, disallowedPatterns)) {
@@ -37,7 +38,7 @@ public class WebCrawlerImpl implements WebCrawler {
             return Collections.emptyMap();
         }
 
-        Map<String, List<String>> visitedUrls = new HashMap<>();
+        Map<String, Set<String>> visitedUrls = new HashMap<>();
         Queue<String> queue = new LinkedList<>();
         queue.add(startUrl);
 
@@ -51,13 +52,13 @@ public class WebCrawlerImpl implements WebCrawler {
             }
 
             htmlDownloader.downloadHtmlDocument(currentUrl);
-            List<String> neighbouringUrls = urlManager.getNeighbouringUrls(currentUrl);
-            visitedUrls.put(currentUrl, neighbouringUrls);
+            Set<String> neighbouringUrls = urlManager.getNeighbouringUrls(currentUrl);
+            Set<String> processedNeighbouringUrls = neighbouringUrlProcessor.processNeighbouringUrls(currentUrl,neighbouringUrls);
+
+            visitedUrls.put(currentUrl, processedNeighbouringUrls);
 
             if (visitedNodes < maxVisitedNodes) {
-                neighbouringUrls.stream()
-                        .map(UrlUtils::trim)
-                        .filter(url -> url.contains(UrlUtils.extractHost(currentUrl)))
+                processedNeighbouringUrls.stream()
                         .filter(url -> !visitedUrls.containsKey(url))
                         .filter(url -> isCrawlAllowed(url, disallowedPatterns))
                         .forEach(queue::add);
