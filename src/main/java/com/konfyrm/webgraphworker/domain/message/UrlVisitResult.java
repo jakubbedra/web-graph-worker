@@ -5,8 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,6 +14,6 @@ import java.util.Map;
 @EqualsAndHashCode
 public class UrlVisitResult {
     private String startUrl;
-    private Map<String, List<String>> neighbours;
+    private Map<String, Set<String>> neighbours;
 }
 
