@@ -11,5 +11,5 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class UrlVisitRequest {
     private String url;
-    private int maxDepth;
+    private int maxVisitedNodes;
 }
