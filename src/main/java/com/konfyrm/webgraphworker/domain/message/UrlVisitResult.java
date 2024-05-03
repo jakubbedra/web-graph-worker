@@ -1,9 +1,6 @@
 package com.konfyrm.webgraphworker.domain.message;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +9,10 @@ import java.util.Set;
 @Setter
 @Builder
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class UrlVisitResult {
+    private String executionUuid;
     private String startUrl;
     private Map<String, Set<String>> neighbours;
 }

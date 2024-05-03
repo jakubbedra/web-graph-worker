@@ -17,9 +17,9 @@ import java.io.IOException;
 @Component
 public class JsoupHtmlDownloader implements HtmlDownloader {
 
-    private static final Logger LOGGER = LogManager.getLogger(JsoupUrlManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(JsoupHtmlDownloader.class);
 
-    @Value("application.crawler.download-path")
+    @Value("${application.crawler.download-path}")
     private String downloadPath;
 
     @Override
