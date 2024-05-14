@@ -13,8 +13,9 @@ public class NeighbouringUrlProcessorImpl implements NeighbouringUrlProcessor {
     public Set<String> processNeighbouringUrls(String currentUrl, Set<String> neighbours) {
         return neighbours.stream()
                 .filter(u -> !u.contains("#"))
+                .filter(url -> !url.endsWith(".pdf"))
                 .map(UrlUtils::trim)
-                .filter(nextUrl -> nextUrl.contains(UrlUtils.extractHost(currentUrl)))
+                .filter(nextUrl -> UrlUtils.extractHost(nextUrl).equals(UrlUtils.extractHost(currentUrl)))
                 .filter(nextUrl -> !nextUrl.equals(currentUrl))
                 .collect(Collectors.toSet());
     }

@@ -23,13 +23,14 @@ public class WebCrawlerImpl implements WebCrawler {
     public WebCrawlerImpl(
             @Qualifier("jsoupUrlManager") UrlManager urlManager,
             @Qualifier("jsoupHtmlDownloader") HtmlDownloader htmlDownloader,
-            @Qualifier("neighbouringUrlProcessorImpl")NeighbouringUrlProcessor neighbouringUrlProcessor
+            @Qualifier("neighbouringUrlProcessorImpl") NeighbouringUrlProcessor neighbouringUrlProcessor
     ) {
         this.urlManager = urlManager;
         this.htmlDownloader = htmlDownloader;
         this.neighbouringUrlProcessor = neighbouringUrlProcessor;
     }
 
+    @Override
     public Map<String, Set<String>> crawl(String startUrl, int maxVisitedNodes) {
         Set<String> disallowedPatterns = urlManager.getDisallowedPatterns(startUrl);
 
@@ -47,13 +48,13 @@ public class WebCrawlerImpl implements WebCrawler {
             String currentUrl = queue.poll();
             visitedNodes++;
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Crawling: " + currentUrl);
-            }
+//            if (LOGGER.isDebugEnabled()) {
+            LOGGER.info("Crawling: " + currentUrl);
+//            }
 
             htmlDownloader.downloadHtmlDocument(currentUrl);
             Set<String> neighbouringUrls = urlManager.getNeighbouringUrls(currentUrl);
-            Set<String> processedNeighbouringUrls = neighbouringUrlProcessor.processNeighbouringUrls(currentUrl,neighbouringUrls);
+            Set<String> processedNeighbouringUrls = neighbouringUrlProcessor.processNeighbouringUrls(currentUrl, neighbouringUrls);
 
             visitedUrls.put(currentUrl, processedNeighbouringUrls);
 
@@ -65,6 +66,28 @@ public class WebCrawlerImpl implements WebCrawler {
             }
         }
         return visitedUrls;
+    }
+
+    @Override
+    public Set<String> crawl(String url) {
+        Set<String> disallowedPatterns = urlManager.getDisallowedPatterns(url);
+
+        if (!isCrawlAllowed(url, disallowedPatterns)) {
+            LOGGER.warn("Crawling not allowed for start url: " + url);
+            return Collections.emptySet();
+        }
+
+//            if (LOGGER.isDebugEnabled()) {
+        LOGGER.info("Crawling: " + url);
+//            }
+
+        htmlDownloader.downloadHtmlDocument(url);
+        Set<String> neighbouringUrls = urlManager.getNeighbouringUrls(url);
+        Set<String> processedNeighbouringUrls = neighbouringUrlProcessor.processNeighbouringUrls(url, neighbouringUrls);
+
+        return processedNeighbouringUrls.stream()
+                .filter(u -> isCrawlAllowed(u, disallowedPatterns))
+                .collect(Collectors.toSet());
     }
 
     private boolean isCrawlAllowed(String url, Set<String> disallowedPatterns) {

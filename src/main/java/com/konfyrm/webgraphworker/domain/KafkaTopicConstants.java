@@ -6,4 +6,6 @@ public class KafkaTopicConstants {
     public static final String RESULT_TOPIC = "web-graph-result";
     public static final String DEFAULT_GROUP = "web-graph-group";
 
+    public static final int MAX_POLL_RECORDS = 20;
+
 }

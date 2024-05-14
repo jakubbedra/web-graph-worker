@@ -1,6 +1,5 @@
 package com.konfyrm.webgraphworker.config;
 
-
 import com.konfyrm.webgraphworker.domain.message.UrlVisitRequest;
 import com.konfyrm.webgraphworker.serialization.UrlVisitRequestDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -17,6 +16,8 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.konfyrm.webgraphworker.domain.KafkaTopicConstants.MAX_POLL_RECORDS;
+
 @Configuration
 public class KafkaConsumerConfig {
 
@@ -28,6 +29,7 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, UrlVisitRequestDeserializer.class);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POLL_RECORDS);
         return props;
     }
 
@@ -43,6 +45,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, UrlVisitRequest> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
+        factory.setBatchListener(true);
         return factory;
     }
 

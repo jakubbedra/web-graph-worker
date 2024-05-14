@@ -31,7 +31,7 @@ public class WebCrawlerImplTest {
     }
 
     @Test
-    public void crawl_startUrlOk_someNeighbours() {
+    public void deprecated_crawl_startUrlOk_someNeighbours() {
         String startUrl = "https://www.jandaciuk.pl";
         Set<String> neighbours = sampleValidNeighboursForStartUrl();
         int maxVisitedNodes = 1;
@@ -48,7 +48,7 @@ public class WebCrawlerImplTest {
     }
 
     @Test
-    public void crawl_startUrlOkMaxVisitedTwoNodes() {
+    public void deprecated_crawl_startUrlOkMaxVisitedTwoNodes() {
         String startUrl = "https://www.jandaciuk.pl";
         String firstNeighbourUrl = "https://www.jandaciuk.pl/papaj";
         Set<String> neighbours = sampleValidNeighboursForStartUrl();
@@ -69,7 +69,7 @@ public class WebCrawlerImplTest {
     }
 
     @Test
-    public void crawl_secondVisitedNodeHasStartUrlNeighbour() {
+    public void deprecated_crawl_secondVisitedNodeHasStartUrlNeighbour() {
         String startUrl = "https://www.jandaciuk.pl";
         Set<String> neighbours = sampleValidNeighbourForStartUrl();
         String firstNeighbourUrl = "https://www.jandaciuk.pl/papaj";
@@ -91,7 +91,7 @@ public class WebCrawlerImplTest {
     }
 
     @Test
-    public void crawl_startUrlDisallowed_emptyMapReturned() {
+    public void deprecated_crawl_startUrlDisallowed_emptyMapReturned() {
         String startUrl = "https://www.jandaciuk.pl";
         Set<String> neighbours = sampleValidNeighboursForStartUrl();
         int maxVisitedNodes = 1;
@@ -105,7 +105,7 @@ public class WebCrawlerImplTest {
     }
 
     @Test
-    public void crawl_neighbourDisallowed() {
+    public void deprecated_crawl_neighbourDisallowed() {
         String startUrl = "https://www.jandaciuk.pl";
         String firstNeighbourUrl = "https://www.jandaciuk.pl/papaj";
         String firstAllowedNeighbourUrl = "https://www.jandaciuk.pl/javashit";
@@ -127,9 +127,57 @@ public class WebCrawlerImplTest {
         Assertions.assertEquals(expectedNodes, nodes);
     }
 
+    @Test
+    public void crawl_startUrlOk_someNeighbours() {
+        String startUrl = "https://www.jandaciuk.pl";
+        Set<String> neighbours = sampleValidNeighboursForStartUrl();
+        when(urlManager.getNeighbouringUrls(Mockito.eq(startUrl))).thenReturn(neighbours);
+        when(urlManager.getNeighbouringUrls(Mockito.argThat(argument -> !startUrl.equals(argument))))
+                .thenReturn(Collections.emptySet());
+        Set<String> expectedNodes = sampleValidNeighboursForStartUrl();
+
+        Set<String> nodes = webCrawler.crawl(startUrl);
+
+        Assertions.assertEquals(expectedNodes, nodes);
+    }
+
+    @Test
+    public void crawl_startUrlDisallowed_emptyMapReturned() {
+        String startUrl = "https://www.jandaciuk.pl";
+        Set<String> neighbours = sampleValidNeighboursForStartUrl();
+        when(urlManager.getNeighbouringUrls(Mockito.eq(startUrl))).thenReturn(neighbours);
+        when(urlManager.getDisallowedPatterns(startUrl)).thenReturn(Set.of(startUrl));
+        Set<String> expectedNodes = Collections.emptySet();
+
+        Set<String> nodes = webCrawler.crawl(startUrl);
+
+        Assertions.assertEquals(expectedNodes, nodes);
+    }
+
+    @Test
+    public void crawl_neighbourDisallowed() {
+        String startUrl = "https://www.jandaciuk.pl";
+        Set<String> neighbours = sampleValidNeighboursForStartUrl();
+        when(urlManager.getNeighbouringUrls(Mockito.eq(startUrl))).thenReturn(neighbours);
+        when(urlManager.getDisallowedPatterns(startUrl)).thenReturn(Set.of("/papaj"));
+        Set<String> expectedNodes = sampleValidNeighboursForStartUrlWithoutDisallowed();
+
+        Set<String> nodes = webCrawler.crawl(startUrl);
+
+        Assertions.assertEquals(expectedNodes, nodes);
+    }
+
     private Set<String> sampleValidNeighboursForStartUrl() {
         return new LinkedHashSet<>(List.of(
                 "https://www.jandaciuk.pl/papaj",
+                "https://www.jandaciuk.pl/javashit",
+                "https://www.jandaciuk.pl/faq",
+                "https://www.jandaciuk.pl/random/bullshit"
+        ));
+    }
+
+    private Set<String> sampleValidNeighboursForStartUrlWithoutDisallowed() {
+        return new LinkedHashSet<>(List.of(
                 "https://www.jandaciuk.pl/javashit",
                 "https://www.jandaciuk.pl/faq",
                 "https://www.jandaciuk.pl/random/bullshit"

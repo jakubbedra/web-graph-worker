@@ -2,7 +2,7 @@ package com.konfyrm.webgraphworker.domain.message;
 
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -10,7 +10,8 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class UrlVisitResult {
-    private String executionUuid;
-    private List<UrlNode> nodes;
+public class UrlNode {
+    private String url;
+    private Set<String> neighbours;
 }
+

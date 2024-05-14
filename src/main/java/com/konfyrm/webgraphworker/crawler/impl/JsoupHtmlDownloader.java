@@ -27,8 +27,10 @@ public class JsoupHtmlDownloader implements HtmlDownloader {
         try {
             Connection connection = Jsoup.connect(url);
             Document document = connection.get();
-            String fileName = UrlUtils.getWithoutHttp(url).replace("/", "-");
-
+            String fileName = UrlUtils.getWithoutHttp(url).replaceAll("[^a-zA-Z0-9]", "-");
+//            if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("Downloading: " + url);
+//            }
             try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(downloadPath + "/" + fileName + ".html"))) {
                 bufferedWriter.write(document.outerHtml());
             }

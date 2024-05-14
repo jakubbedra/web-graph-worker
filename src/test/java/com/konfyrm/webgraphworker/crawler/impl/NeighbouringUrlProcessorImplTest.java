@@ -49,6 +49,32 @@ public class NeighbouringUrlProcessorImplTest {
         Assertions.assertEquals(expectedNeighbours, processedNeighbours);
     }
 
+    @Test
+    public void crawl_pdfNeighbour() {
+        String startUrl = "https://www.jandaciuk.pl";
+        Set<String> neighbours = sampleNeighboursWithPfd();
+        Set<String> expectedNeighbours = sampleNeighboursWithoutPfd();
+
+        Set<String> processedNeighbours = neighbouringUrlProcessor.processNeighbouringUrls(startUrl, neighbours);
+
+        Assertions.assertEquals(expectedNeighbours, processedNeighbours);
+    }
+
+    private Set<String> sampleNeighboursWithPfd() {
+        return new LinkedHashSet<>(List.of(
+                "https://www.jandaciuk.pl/javashit.pdf",
+                "https://www.jandaciuk.pl/faq",
+                "https://www.jandaciuk.pl/random/bullshit"
+        ));
+    }
+
+    private Set<String> sampleNeighboursWithoutPfd() {
+        return new LinkedHashSet<>(List.of(
+                "https://www.jandaciuk.pl/faq",
+                "https://www.jandaciuk.pl/random/bullshit"
+        ));
+    }
+
     private Set<String> sampleValidNeighboursForStartUrlWithDuplicate() {
         return new LinkedHashSet<>(List.of(
                 "https://www.jandaciuk.pl/",
