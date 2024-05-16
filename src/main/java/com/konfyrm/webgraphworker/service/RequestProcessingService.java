@@ -8,6 +8,6 @@ import java.util.Set;
 
 public interface RequestProcessingService {
     Map<String, Set<String>> processRequest(String startUrl, int maxVisitedNodes);
-    List<UrlNode> processRequests(List<String> urls);
+    List<UrlNode> processRequests(String executionUuid, List<String> urls);
 }
 

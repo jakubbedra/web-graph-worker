@@ -43,7 +43,7 @@ public class UrlVisitRequestListener {
             List<String> urls = requestsByExecution.get(executionUuid).stream()
                     .map(UrlVisitRequest::getUrl)
                     .toList();
-            List<UrlNode> results = requestProcessingService.processRequests(urls);
+            List<UrlNode> results = requestProcessingService.processRequests(executionUuid, urls);
             Iterable<List<UrlNode>> partition = Iterables.partition(results, REQUEST_PARTITION); // todo: change to use calculator. estimate avg object size
             for (List<UrlNode> urlNodes : partition) {
                 UrlVisitResult result = UrlVisitResult.builder()

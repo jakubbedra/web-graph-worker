@@ -1,5 +1,7 @@
 package com.konfyrm.webgraphworker.crawler.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.konfyrm.webgraphworker.crawler.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,10 +10,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
 public class WebCrawlerImpl implements WebCrawler {
+
+    private static final Cache<String, Set<String>> cache = CacheBuilder.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build();
 
     private static final Logger LOGGER = LogManager.getLogger(WebCrawlerImpl.class);
 
@@ -69,8 +77,8 @@ public class WebCrawlerImpl implements WebCrawler {
     }
 
     @Override
-    public Set<String> crawl(String url) {
-        Set<String> disallowedPatterns = urlManager.getDisallowedPatterns(url);
+    public Set<String> crawl(String executionUuid, String url) {
+        Set<String> disallowedPatterns = fetchDisallowedPatterns(executionUuid);
 
         if (!isCrawlAllowed(url, disallowedPatterns)) {
             LOGGER.warn("Crawling not allowed for start url: " + url);
@@ -88,6 +96,15 @@ public class WebCrawlerImpl implements WebCrawler {
         return processedNeighbouringUrls.stream()
                 .filter(u -> isCrawlAllowed(u, disallowedPatterns))
                 .collect(Collectors.toSet());
+    }
+
+    private Set<String> fetchDisallowedPatterns(String executionUuid) {
+        try {
+            return cache.get(executionUuid, () -> urlManager.getDisallowedPatterns(executionUuid));
+        } catch (ExecutionException e) {
+            LOGGER.warn("Error fetching value from cache: " + e.getMessage());
+        }
+        return Collections.emptySet();
     }
 
     private boolean isCrawlAllowed(String url, Set<String> disallowedPatterns) {

@@ -24,7 +24,7 @@ public class UrlUtils {
     }
 
     public static String getBaseUrl(String url) {
-        return "https://" + url.split("/")[2];
+        return "https://" + extractHost(url);
     }
 
     public static String getWithoutHttp(String url) {

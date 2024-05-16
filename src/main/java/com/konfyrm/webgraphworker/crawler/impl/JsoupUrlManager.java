@@ -40,13 +40,13 @@ public class JsoupUrlManager implements UrlManager {
     }
 
     @Override
-    public Set<String> getDisallowedPatterns(java.lang.String url) {
+    public Set<String> getDisallowedPatterns(String url) {
         try {
-            java.lang.String baseUrl = UrlUtils.getBaseUrl(url);
-            java.lang.String robotsUrl = baseUrl + "/" + ROBOTS_FILE;
+            String baseUrl = UrlUtils.getBaseUrl(url);
+            String robotsUrl = baseUrl + "/" + ROBOTS_FILE;
             Connection connection = Jsoup.connect(robotsUrl);
             Document document = connection.get();
-            java.lang.String[] split = document.text().split("\n");
+            String[] split = document.text().split("\n");
             return Arrays.stream(split)
                     .filter(s -> s.contains(DISALLOW))
                     .map(s -> s.replace(DISALLOW, ""))

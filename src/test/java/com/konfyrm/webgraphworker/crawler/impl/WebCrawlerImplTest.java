@@ -136,7 +136,7 @@ public class WebCrawlerImplTest {
                 .thenReturn(Collections.emptySet());
         Set<String> expectedNodes = sampleValidNeighboursForStartUrl();
 
-        Set<String> nodes = webCrawler.crawl(startUrl);
+        Set<String> nodes = webCrawler.crawl("2137", startUrl);
 
         Assertions.assertEquals(expectedNodes, nodes);
     }
@@ -149,7 +149,7 @@ public class WebCrawlerImplTest {
         when(urlManager.getDisallowedPatterns(startUrl)).thenReturn(Set.of(startUrl));
         Set<String> expectedNodes = Collections.emptySet();
 
-        Set<String> nodes = webCrawler.crawl(startUrl);
+        Set<String> nodes = webCrawler.crawl("2137", startUrl);
 
         Assertions.assertEquals(expectedNodes, nodes);
     }
@@ -162,7 +162,7 @@ public class WebCrawlerImplTest {
         when(urlManager.getDisallowedPatterns(startUrl)).thenReturn(Set.of("/papaj"));
         Set<String> expectedNodes = sampleValidNeighboursForStartUrlWithoutDisallowed();
 
-        Set<String> nodes = webCrawler.crawl(startUrl);
+        Set<String> nodes = webCrawler.crawl("2137", startUrl);
 
         Assertions.assertEquals(expectedNodes, nodes);
     }

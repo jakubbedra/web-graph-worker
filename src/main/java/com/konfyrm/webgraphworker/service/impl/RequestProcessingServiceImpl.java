@@ -31,10 +31,10 @@ public class RequestProcessingServiceImpl implements RequestProcessingService {
     }
 
     @Override
-    public List<UrlNode> processRequests(List<String> urls) {
+    public List<UrlNode> processRequests(String executionUuid, List<String> urls) {
         List<UrlNode> results = new LinkedList<>();
         for (String url : urls) {
-            Set<String> neighbours = webCrawler.crawl(url);
+            Set<String> neighbours = webCrawler.crawl(executionUuid, url);
             UrlNode urlNode = UrlNode.builder()
                     .url(url)
                     .neighbours(neighbours)

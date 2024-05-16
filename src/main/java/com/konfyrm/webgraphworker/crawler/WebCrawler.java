@@ -6,5 +6,5 @@ import java.util.Set;
 public interface WebCrawler {
     @Deprecated
     Map<String, Set<String>> crawl(String startUrl, int maxDepth);
-    Set<String> crawl(String startUrl);
+    Set<String> crawl(String executionUuid, String startUrl);
 }
