@@ -2,7 +2,6 @@ package com.konfyrm.webgraphworker.service.impl;
 
 import com.konfyrm.webgraphworker.crawler.WebCrawler;
 import com.konfyrm.webgraphworker.domain.message.UrlNode;
-import com.konfyrm.webgraphworker.domain.message.UrlVisitResult;
 import com.konfyrm.webgraphworker.service.RequestProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,3 +44,4 @@ public class RequestProcessingServiceImpl implements RequestProcessingService {
     }
 
 }
+
