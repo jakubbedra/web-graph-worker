@@ -39,45 +39,7 @@ public class WebCrawlerImpl implements WebCrawler {
     }
 
     @Override
-    public Map<String, Set<String>> crawl(String startUrl, int maxVisitedNodes) {
-        Set<String> disallowedPatterns = urlManager.getDisallowedPatterns(startUrl);
-
-        if (!isCrawlAllowed(startUrl, disallowedPatterns)) {
-            LOGGER.warn("Crawling not allowed for start url: " + startUrl);
-            return Collections.emptyMap();
-        }
-
-        Map<String, Set<String>> visitedUrls = new HashMap<>();
-        Queue<String> queue = new LinkedList<>();
-        queue.add(startUrl);
-
-        int visitedNodes = 0;
-        while (!queue.isEmpty() && visitedNodes < maxVisitedNodes) {
-            String currentUrl = queue.poll();
-            visitedNodes++;
-
-//            if (LOGGER.isDebugEnabled()) {
-            LOGGER.info("Crawling: " + currentUrl);
-//            }
-
-            htmlDownloader.downloadHtmlDocument(currentUrl);
-            Set<String> neighbouringUrls = urlManager.getNeighbouringUrls(currentUrl);
-            Set<String> processedNeighbouringUrls = neighbouringUrlProcessor.processNeighbouringUrls(currentUrl, neighbouringUrls);
-
-            visitedUrls.put(currentUrl, processedNeighbouringUrls);
-
-            if (visitedNodes < maxVisitedNodes) {
-                processedNeighbouringUrls.stream()
-                        .filter(url -> !visitedUrls.containsKey(url))
-                        .filter(url -> isCrawlAllowed(url, disallowedPatterns))
-                        .forEach(queue::add);
-            }
-        }
-        return visitedUrls;
-    }
-
-    @Override
-    public Set<String> crawl(String executionUuid, String url) {
+    public Set<String> crawl(String executionUuid, String url, boolean downloadFiles) {
         Set<String> disallowedPatterns = fetchDisallowedPatterns(executionUuid);
 
         if (!isCrawlAllowed(url, disallowedPatterns)) {
@@ -85,11 +47,11 @@ public class WebCrawlerImpl implements WebCrawler {
             return Collections.emptySet();
         }
 
-//            if (LOGGER.isDebugEnabled()) {
         LOGGER.info("Crawling: " + url);
-//            }
 
-        htmlDownloader.downloadHtmlDocument(url);
+        if (downloadFiles) {
+            htmlDownloader.downloadHtmlDocument(url);
+        }
         Set<String> neighbouringUrls = urlManager.getNeighbouringUrls(url);
         Set<String> processedNeighbouringUrls = neighbouringUrlProcessor.processNeighbouringUrls(url, neighbouringUrls);
 

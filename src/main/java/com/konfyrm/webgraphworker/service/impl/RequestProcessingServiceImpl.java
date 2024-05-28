@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -25,15 +24,10 @@ public class RequestProcessingServiceImpl implements RequestProcessingService {
     }
 
     @Override
-    public Map<String, Set<String>> processRequest(String startUrl, int maxVisitedNodes) {
-        return webCrawler.crawl(startUrl, maxVisitedNodes);
-    }
-
-    @Override
-    public List<UrlNode> processRequests(String executionUuid, List<String> urls) {
+    public List<UrlNode> processRequests(String executionUuid, List<String> urls, boolean downloadFiles) {
         List<UrlNode> results = new LinkedList<>();
         for (String url : urls) {
-            Set<String> neighbours = webCrawler.crawl(executionUuid, url);
+            Set<String> neighbours = webCrawler.crawl(executionUuid, url, downloadFiles);
             UrlNode urlNode = UrlNode.builder()
                     .url(url)
                     .neighbours(neighbours)
